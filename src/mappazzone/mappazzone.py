@@ -60,6 +60,10 @@ def main(language, nolog, logdir):
     app.mainloop()
 
 
+def main_gui():
+    main(language=None, nolog=False, logdir=None)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="The Mappazzone geolocalization game."

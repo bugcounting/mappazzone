@@ -14,19 +14,21 @@ class Option:
     choices: List
     value: Any
     _var: Any = None
-    
+
     def set(self, value: Any):
         """Set option to `value`. If `value` is a string that is not
         one of the available `choices`, try to convert the string
         based on the type of `choices`'s first element."""
         if value in self.choices:
             self.value = value
-        elif type(value) is str and self.choices and value in [str(o) for o in self.choices]:
+        elif isinstance(value, str) and self.choices and value in [str(o) for o in self.choices]:
             self.value = type(self.choices[0])(value)
         else:
-            raise ValueError(f"{value} is not a valid choice for option {self.name}")
+            raise ValueError(
+                f"{value} is not a valid choice for option {self.name}")
 
     def get(self) -> str:
+        """Get currently selected option value as a string."""
         return str(self.value)
 
 
@@ -71,7 +73,7 @@ class Options_:
     def turn_delay(self) -> int:
         """Wait these seconds between turns."""
         return self['turn delay']
-    
+
     def board(self) -> Board.BoardOptions:
         """Options for board setup."""
         return Board.BoardOptions(size=self['grid size'],
@@ -122,7 +124,8 @@ class Options_:
         return ""
 
     def __str__(self) -> str:
-        options = [f"'{name}': {option.value}" for name, option in self.items()]
+        options = [f"'{name}': {option.value}" for name,
+                   option in self.items()]
         return ", ".join(options)
 
     def __init__(self):
@@ -287,52 +290,76 @@ class OptionsEN(Options_):
         ),
         'tolerance': _OptDesc(
             name="Tolerance",
-            description="Two cities whose longitude (resp. latitude) differ less than the tolerance can be placed in any two columns (resp. row)."
-        ),
+            description=(
+                "Two cities whose longitude (resp. latitude) "
+                "differ less than the tolerance can be placed "
+                "in any two columns (resp. row)."
+                )),
         'draw when fail': _OptDesc(
             name="Cities drawn on fail",
-            description="Number of new cities a player has to draws when they place a city incorrectly."
-        ),
+            description=(
+                "Number of new cities a player has to draws "
+                "when they place a city incorrectly."
+                )),
         'draw per mistake': _OptDesc(
             name="Draw for each mistake",
-            description="If selected, a player who placed a city incorrectly has to draw cities for each direction that they got wrong."
-        ),
+            description=(
+                "If selected, a player who placed a city "
+                "incorrectly has to draw cities for each direction "
+                "that they got wrong."
+                )),
         'stop drawing': _OptDesc(
             name="Stop drawing",
-            description="When a player has these many cities in their hand, they do not draw new cities even if they play wrong."
-        ),
+            description=(
+            "When a player has these many cities in their hand, "
+            "they do not draw new cities even if they play wrong."
+            )),
         'end hand': _OptDesc(
             name="Max cities in hand",
-            description="When a player has these many cities in their hand, the game ends."
-        ),
+            description=(
+                "When a player has these many cities in their hand, "
+                "the game ends."
+                )),
         'end rounds': _OptDesc(
             name="Max rounds",
-            description="The game ends after these many rounds (a negative number means no limit)."
-        ),
+            description=(
+                "The game ends after these many rounds "
+                "(a negative number means no limit)."
+                )),
         'end placed': _OptDesc(
             name="Max cities on board",
-            description="When there are these many many cities placed on the board, the game ends (a negative number means no limit)."
-        ),
+            description=(
+                "When there are these many many cities placed on the board, "
+                "the game ends (a negative number means no limit)."
+                )),
         'empty deck': _OptDesc(
             name="Empty deck",
-            description="Number of locations in the deck for which it's considered 'empty', and the game ends."
-        ),
+            description=(
+                "Number of locations in the deck for which "
+                "it's considered 'empty', and the game ends."
+                )),
         'may swap': _OptDesc(
             name="Allow swapping",
             description="Can a player change a city instead of placing it?"
         ),
         'only sat': _OptDesc(
             name="Only draw placeable",
-            description="If enabled, only cities that can be placed somewhere on the board will be drawn."
-        ),
+            description=(
+                "If enabled, only cities that can be placed somewhere "
+                "on the board will be drawn."
+                )),
         'wrap': _OptDesc(
             name="Wrap longitudes",
-            description="If enabled, longitudes 'wrap over' 180 degrees in each direction. For example, Japan (+138) can be placed west of Hawaii (-155)."
-        ),
+            description=(
+                "If enabled, longitudes 'wrap over' 180 degrees in each direction. "
+                "For example, Japan (+138) can be placed west of Hawaii (-155)."
+                )),
         'turn delay': _OptDesc(
             name="Turn delay",
-            description="Wait these many seconds after each turn before moving on to the next player."
-        ),
+            description=(
+                "Wait these many seconds after each turn "
+                "before moving on to the next player."
+                )),
     }
 
 

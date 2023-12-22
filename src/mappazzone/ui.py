@@ -3,8 +3,6 @@ import logging
 import copy
 import platform
 import os
-# sudo apt-get install python3-tk idle3 python3-pil python3-pil.imagetk
-# https://stackoverflow.com/a/49325719
 import tkinter as tk
 from tkinter import font as tkfont
 from idlelib.tooltip import Hovertip
@@ -30,6 +28,7 @@ class MappUI(tk.Tk):
     messages: Messages
     logger: logging.Logger
 
+    # https://stackoverflow.com/a/49325719
     def __init__(self, options: Options, locations: Locations):
         tk.Tk.__init__(self)
         self.log_setup()

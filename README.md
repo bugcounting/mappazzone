@@ -8,7 +8,11 @@ geographical coordinates.
 ## Release bundles
 
 The easiest way to install *Mappazzone!* is by using one of the
-[release bundles](releases/latest) generated with PyInstaller.
+[release bundles](/../../releases/latest) generated with PyInstaller.
+
+1. Download and unpack the archive bundle for your operating system.
+
+2. Launch the executable `mappazzone` in the unpacked directory.
 
 ## Installation
 

@@ -5,8 +5,10 @@ APP_NAME = 'mappazzone'
 
 from pathlib import Path
 
-FLAGS_DIR = 'flags'
+MAIN_DIR = Path('src', 'mappazzone')
 
-DATA_DIR = 'data'
+FLAGS_DIR = Path(MAIN_DIR, 'flags')
+
+DATA_DIR = Path(MAIN_DIR, 'data')
 CONTINENTS_PATH = Path(DATA_DIR, 'continents.csv')
 CITIES_PATH = Path(DATA_DIR, 'worldcities.csv')

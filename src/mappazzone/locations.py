@@ -9,7 +9,7 @@ import sys
 import re
 import random
 
-from constants import ENV_LANGUAGE, CONTINENTS_PATH, CITIES_PATH
+from .constants import ENV_LANGUAGE, CONTINENTS_PATH, CITIES_PATH
 
 
 class Direction(Enum):

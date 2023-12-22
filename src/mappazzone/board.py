@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 import logging
 
-from locations import Direction, Location
+from .locations import Direction, Location
 
     
 @dataclass

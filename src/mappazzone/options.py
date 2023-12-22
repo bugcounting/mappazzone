@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from typing import Any, List, Set
 import os
 
-from constants import ENV_LANGUAGE
-from locations import Continent, Direction
-from board import Board
+from .constants import ENV_LANGUAGE
+from .locations import Continent, Direction
+from .board import Board
 
 
 @dataclass

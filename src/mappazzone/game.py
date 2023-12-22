@@ -1,9 +1,9 @@
 from typing import List
 import logging
 
-from locations import Direction, Location, Locations
-from board import Board
-from options import Options
+from .locations import Direction, Location, Locations
+from .board import Board
+from .options import Options
 
 
 class Player:

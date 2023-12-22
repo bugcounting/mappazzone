@@ -1,11 +1,11 @@
 import pytest
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../src/mappazzone')
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../src')
 
-from constants import ENV_LANGUAGE
+from mappazzone.constants import ENV_LANGUAGE
 os.environ[ENV_LANGUAGE] = 'EN'
-from locations import Continent, Direction, Location, Locations
+from mappazzone.locations import Continent, Direction, Location, Locations
 
 
 class TestLocation:

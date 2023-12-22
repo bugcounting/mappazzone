@@ -1,13 +1,13 @@
 import pytest
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../src/mappazzone')
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../src')
 
-from constants import ENV_LANGUAGE
+from mappazzone.constants import ENV_LANGUAGE
 os.environ[ENV_LANGUAGE] = 'EN'
-from locations import Continent, Direction, Location, Locations
-from options import Options
-from game import Player, Game
+from mappazzone.locations import Continent, Direction, Location, Locations
+from mappazzone.options import Options
+from mappazzone.game import Player, Game
 
 
 class TestPlayer:

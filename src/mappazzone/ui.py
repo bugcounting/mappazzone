@@ -11,12 +11,12 @@ from idlelib.tooltip import Hovertip
 from PIL import Image, ImageTk
 import textwrap
 
-from constants import FLAGS_DIR
-from utils import DisplayName, monitor_size
-from themes import Messages
-from options import Options
-from locations import Direction, Location, Locations
-from game import Game
+from .constants import FLAGS_DIR
+from .utils import DisplayName, monitor_size
+from .themes import Messages
+from .options import Options
+from .locations import Direction, Location, Locations
+from .game import Game
 
 
 class MappUI(tk.Tk):

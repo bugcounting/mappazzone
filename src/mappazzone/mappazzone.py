@@ -6,7 +6,7 @@ import platformdirs
 from pathlib import Path
 import argparse
 
-from constants import LANGUAGES, ENV_LANGUAGE, APP_NAME
+from .constants import LANGUAGES, ENV_LANGUAGE, APP_NAME
 
 
 def handle_exception(exc_type, exc_value, exc_traceback):
@@ -53,18 +53,14 @@ def main(language, nolog, logdir):
         language = 'IT' if lang.startswith('it_') else 'EN'
         logging.getLogger('').debug(f'Language set to {language} based on locale {lang}')
     os.environ[ENV_LANGUAGE] = language
-    from ui import MappUI
-    from locations import Locations
-    from options import Options
+    from .ui import MappUI
+    from .locations import Locations
+    from .options import Options
     app = MappUI(options=Options(), locations=Locations(load=True))
     app.mainloop()
 
 
 def main_gui():
-    main(language=None, nolog=False, logdir=None)
-
-
-if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="The Mappazzone geolocalization game."
         )
@@ -76,3 +72,7 @@ if __name__ == "__main__":
                         help='Set directory where log files are stored.')
     args = parser.parse_args()
     main(args.language, args.nolog, args.logdir)
+
+
+if __name__ == "__main__":
+    main_gui()

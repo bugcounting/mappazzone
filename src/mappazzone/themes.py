@@ -1,7 +1,7 @@
 import os
 import logging
 
-from constants import ENV_LANGUAGE
+from .constants import ENV_LANGUAGE
 
 
 class Messages_:

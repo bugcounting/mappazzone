@@ -8,7 +8,7 @@ from tkinter import font as tkfont
 from PIL import Image
 import screeninfo
 
-from constants import FLAGS_DIR
+from .constants import FLAGS_DIR
 
 BLANK_FLAG = '_blank_'
 

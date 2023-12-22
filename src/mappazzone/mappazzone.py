@@ -50,7 +50,7 @@ def main(language, nolog, logdir):
         # Determine system language
         import locale
         lang, charset = locale.getlocale()
-        language = 'IT' if lang.startswith('it_') else 'EN'
+        language = 'IT' if lang and lang.startswith('it_') else 'EN'
         logging.getLogger('').debug(f'Language set to {language} based on locale {lang}')
     os.environ[ENV_LANGUAGE] = language
     from .ui import MappUI

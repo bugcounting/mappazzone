@@ -1,0 +1,54 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mappazzone"
+version = "0.1.0"
+description = "A simple geolocalization board game."
+readme = "README.md"
+license = {file="LICENSE"}
+authors = [
+  {name = "Carlo A. Furia", email = "c.a.furia@gmail.com"},
+]
+keywords = ["board game", "geolocalization"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: End Users/Desktop",
+  "Topic :: Software Development :: Build Tools",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+  "Natural Language :: English",
+  "Natural Language :: Italian",
+  "Programming Language :: Python :: 3.10",
+  "Operating System :: OS Independent",
+"Topic :: Games/Entertainment :: Board Games",
+]
+
+requires-python = ">=3.10"
+dependencies = [
+				 "platformdirs",
+				 "screeninfo",
+				 "pillow",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src/data/*.csv",
+  "/src/flags/*.png",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mappazzone"]
+
+[project.urls]
+Repository = "https://github.com/bugcounting/mappazzone.git"
+
+[project.optional-dependencies]
+dev = [
+	 "pytest",
+	 "flagpy",
+	 "country_converter",
+]
+
+[project.gui-scripts]
+mappazzone = "mappazzone.mappazzone:main_gui"

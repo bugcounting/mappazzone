@@ -3,9 +3,10 @@ ENV_LANGUAGE = 'ENV_LANGUAGE'
 
 APP_NAME = 'mappazzone'
 
+import os
 from pathlib import Path
 
-MAIN_DIR = Path('src', 'mappazzone')
+MAIN_DIR = os.path.abspath(os.path.dirname(__file__))
 
 FLAGS_DIR = Path(MAIN_DIR, 'flags')
 

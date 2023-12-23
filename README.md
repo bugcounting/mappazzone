@@ -4,7 +4,6 @@
 have to place cities on a grid in a way that is consistent with their
 geographical coordinates.
 
-
 ## Release bundles
 
 The easiest way to install *Mappazzone!* is by using one of the

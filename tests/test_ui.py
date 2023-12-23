@@ -15,6 +15,7 @@ from mappazzone.ui import GameUI
 
 class TestUI:
 
+    # https://stackoverflow.com/a/49028688
     def pump_events(self, root: tk.Tk):
         """Process all pending events in `root`."""
         while root.dooneevent(tk._tkinter.ALL_EVENTS | tk._tkinter.DONT_WAIT):

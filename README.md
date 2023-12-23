@@ -34,20 +34,18 @@ Here is how to install them in Debian/Ubuntu Linux distributions:
 sudo apt install python3-venv python3-tk idle3 python3-pil python3-pil.imagetk
 ```
 
-Then, check that you have the building tools installed and up to date:
-
-```bash
-python3 -m pip install --upgrade pip setuptools wheel build hatch
-```
-
-### Virtual environment
-
 Let's create a virtual environment `mpz` to easily install the project
 and its dependencies.
 
 ```bash
 python3 -m venv mpz
 source mpz/bin/activate
+```
+
+Finally, install the building tools in the virtual environment:
+
+```bash
+python3 -m pip install --upgrade pip setuptools wheel build hatch
 ```
 
 ### Building the project

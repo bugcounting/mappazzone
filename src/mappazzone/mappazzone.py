@@ -8,6 +8,7 @@ import locale
 from pathlib import Path
 import argparse
 import platformdirs
+import tkinter as tk
 
 from .constants import LANGUAGES, ENV_LANGUAGE, APP_NAME
 
@@ -49,9 +50,9 @@ def log_setup(nolog=False, logdir=None):
     sys.excepthook = handle_exception
 
 
-def run(language, nolog, logdir):
+def run(language, nolog, logdir, startloop=True) -> tk.Tk:
     """
-    Run the application.
+    Run the application and return it.
 
     Args:
         language: The language of the application.
@@ -72,7 +73,9 @@ def run(language, nolog, logdir):
     from .locations import Locations
     from .ui import MappUI
     app = MappUI(options=Options(), locations=Locations(load=True))
-    app.mainloop()
+    if startloop:
+        app.mainloop()
+    return app
 
 
 def main_gui():

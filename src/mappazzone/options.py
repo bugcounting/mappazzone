@@ -1,3 +1,5 @@
+"""This module provides support for game options in multiple languages."""
+
 from dataclasses import dataclass
 from typing import Any, List, Set
 import os
@@ -9,10 +11,21 @@ from .board import Board
 
 @dataclass
 class Option:
+    """
+    An option whose value can range over a set of choices.
+
+    Attributes:
+        name: The displayed name of the option.
+        description: A textual description of the option.
+        choices: A list of possible values for the option.
+        value: The current value of the option.
+    """
     name: str
     description: str
     choices: List
     value: Any
+
+    # Used to store UI components associated with an option.
     _var: Any = None
 
     def set(self, value: Any):
@@ -34,23 +47,29 @@ class Option:
 
 @dataclass(frozen=True)
 class _OptDesc:
+    """Use this to provide locale-specific translations of option names and descriptions."""
     name: str = ''
     description: str = ''
 
 
 @dataclass
-class Options_:
+class EmptyOptions:
+    """A dictionary of game options, whose keys are option tags."""
 
-    def __getitem__(self, option_name: str) -> Any:
-        return self.get_option(option_name).value
+    def __getitem__(self, option_tag: str) -> Any:
+        """Get value of option with given tag."""
+        return self.get_option(option_tag).value
 
-    def get_option(self, option_name: str) -> Option:
-        return self._OPTIONS[option_name]
+    def get_option(self, option_tag: str) -> Option:
+        """Get option object with given tag."""
+        return self._OPTIONS[option_tag]
 
-    def set_option(self, option_name: str, value: Any):
-        self._OPTIONS[option_name].set(value)
+    def set_option(self, option_tag: str, value: Any):
+        """Set option with given tag to given value."""
+        self._OPTIONS[option_tag].set(value)
 
     def items(self):
+        """Return iterator over (option_tag, option) pairs."""
         return self._OPTIONS.items()
 
     def continents(self) -> Set[Continent]:
@@ -100,28 +119,27 @@ class Options_:
             draw = self['draw when fail']
         if hand + draw > self['stop drawing']:
             return self['stop drawing'] - hand
-        else:
-            return draw
+        return draw
 
     def gameover(self, rounds: int, scores: List[int], placed: int, deck: int) -> str:
         """Given the number of completed `rounds`, the list of player
         `scores`, how many cities are `placed` on the board, and how
         many are still available in the `deck`, determine whether the
-        game is over. Return string with gameover reason, or empty
-        string if the game is not over."""
+        game is over. Return string with the name of a gameover reason 
+        in Messages, or the empty string if the game is not over."""
         if 0 < self['end rounds'] < rounds:
-            return f"The game is over after {self['end rounds']} rounds."
+            return 'game over rounds'
         for score in scores:
             if score == 0:
-                return "The game is over after a player has placed all their locations."
-            elif score >= self['end hand']:
-                return f"The game is over after a player has {self['end hand']} or more locations in their hand."
+                return 'game over score'
+            if score >= self['end hand']:
+                return 'game over hand'
         if 0 < self['end placed'] <= placed:
-            return f"The game is over after {self['end placed']} locations have been placed on the board."
+            return 'game over placed'
         # len(scores) gives the number of players
         if deck - self['empty deck'] <= len(scores):
-            return "The game is over because the deck is empty."
-        return ""
+            return 'game over deck'
+        return ''
 
     def __str__(self) -> str:
         options = [f"'{name}': {option.value}" for name,
@@ -252,7 +270,8 @@ class Options_:
     }
 
 
-class OptionsEN(Options_):
+class OptionsEN(EmptyOptions):
+    """Dictionary of game options with descriptions in English."""
 
     _DESCRIPTIONS = {
         'grid size': _OptDesc(
@@ -294,50 +313,50 @@ class OptionsEN(Options_):
                 "Two cities whose longitude (resp. latitude) "
                 "differ less than the tolerance can be placed "
                 "in any two columns (resp. row)."
-                )),
+            )),
         'draw when fail': _OptDesc(
             name="Cities drawn on fail",
             description=(
                 "Number of new cities a player has to draws "
                 "when they place a city incorrectly."
-                )),
+            )),
         'draw per mistake': _OptDesc(
             name="Draw for each mistake",
             description=(
                 "If selected, a player who placed a city "
                 "incorrectly has to draw cities for each direction "
                 "that they got wrong."
-                )),
+            )),
         'stop drawing': _OptDesc(
             name="Stop drawing",
             description=(
-            "When a player has these many cities in their hand, "
-            "they do not draw new cities even if they play wrong."
+                "When a player has these many cities in their hand, "
+                "they do not draw new cities even if they play wrong."
             )),
         'end hand': _OptDesc(
             name="Max cities in hand",
             description=(
                 "When a player has these many cities in their hand, "
                 "the game ends."
-                )),
+            )),
         'end rounds': _OptDesc(
             name="Max rounds",
             description=(
                 "The game ends after these many rounds "
                 "(a negative number means no limit)."
-                )),
+            )),
         'end placed': _OptDesc(
             name="Max cities on board",
             description=(
                 "When there are these many many cities placed on the board, "
                 "the game ends (a negative number means no limit)."
-                )),
+            )),
         'empty deck': _OptDesc(
             name="Empty deck",
             description=(
                 "Number of locations in the deck for which "
                 "it's considered 'empty', and the game ends."
-                )),
+            )),
         'may swap': _OptDesc(
             name="Allow swapping",
             description="Can a player change a city instead of placing it?"
@@ -347,29 +366,31 @@ class OptionsEN(Options_):
             description=(
                 "If enabled, only cities that can be placed somewhere "
                 "on the board will be drawn."
-                )),
+            )),
         'wrap': _OptDesc(
             name="Wrap longitudes",
             description=(
                 "If enabled, longitudes 'wrap over' 180 degrees in each direction. "
                 "For example, Japan (+138) can be placed west of Hawaii (-155)."
-                )),
+            )),
         'turn delay': _OptDesc(
             name="Turn delay",
             description=(
                 "Wait these many seconds after each turn "
                 "before moving on to the next player."
-                )),
+            )),
     }
 
 
-class OptionsIT(Options_):
+class OptionsIT(EmptyOptions):
+    """Dictionary of game options with descriptions in Italian."""
 
     _DESCRIPTIONS = {
         'grid size': _OptDesc(
             name="Dimensione mappa",
-            description="Numero di celle in ciascuna metà della mappa di gioco (senza contare il centro)."
-        ),
+            description=(
+                "Numero di celle in ciascuna metà della mappa di gioco (senza contare il centro)."
+            )),
         'initial cities': _OptDesc(
             name="Città iniziali",
             description="Numero di città per giocatore all'inizio di una partita."
@@ -401,52 +422,77 @@ class OptionsIT(Options_):
         ),
         'tolerance': _OptDesc(
             name="Tolleranza",
-            description="Due città le cui longitudini (rispettivamente, latitudini) differiscono di meno della tolleranza possono essere piazzate in qualsiasi due colonne (rispettivamente, righe)."
-        ),
+            description=(
+                "Due città le cui longitudini (rispettivamente, latitudini) differiscono "
+                "di meno della tolleranza possono essere piazzate in qualsiasi due colonne "
+                "(rispettivamente, righe)."
+            )),
         'draw when fail': _OptDesc(
             name="Città pescate in caso di errore",
-            description="Numero di nuove città un giocatore riceve quando piazza una città in maniera incorretta."
-        ),
+            description=(
+                "Numero di nuove città un giocatore riceve quando piazza "
+                "una città in maniera incorretta."
+            )),
         'draw per mistake': _OptDesc(
             name="Pescare per errore",
-            description="Se questa opzione è selezionata, un giocatore che ha piazzato una città incorrettamente deve pescare città per ciascuna direzione che ha sbagliato."
-        ),
+            description=(
+                "Se questa opzione è selezionata, un giocatore che ha piazzato "
+                "una città incorrettamente deve pescare città "
+                "per ciascuna direzione che ha sbagliato."
+            )),
         'stop drawing': _OptDesc(
             name="Limite pesca",
-            description="Quando un giocatore ha questo numero di città in mano, non pesca nuove città anche se sbaglia."
-        ),
+            description=(
+                "Quando un giocatore ha questo numero di città in mano, "
+                "non pesca nuove città anche se sbaglia."
+            )),
         'end hand': _OptDesc(
             name="Massimo numero città",
-            description="Quando un giocatore ha questo numero di città in mano, la partita termina."
-        ),
+            description=(
+                "Quando un giocatore ha questo numero di città in mano, "
+                "la partita termina."
+            )),
         'end rounds': _OptDesc(
             name="Massimo numero turni",
-            description="La partita termina passati questo numero di turni (un numero negativo significa che non c'è limite)."
-        ),
+            description=(
+                "La partita termina passati questo numero di turni "
+                "(un numero negativo significa che non c'è limite)."
+            )),
         'end placed': _OptDesc(
             name="Massimo città piazzate",
-            description="Quando questo numero di città sono posizionate sul tavolo di gioco, la partita termina (un numero negativo significa che non c'è limite)."
-        ),
+            description=(
+                "Quando questo numero di città sono posizionate sul tavolo di gioco, "
+                "la partita termina (un numero negativo significa che non c'è limite)."
+            )),
         'empty deck': _OptDesc(
             name="Mazzo esaurito",
-            description="Numero di città rimanenti nel mazzo per il quale è considerato esaurito, e la partita termina."
-        ),
+            description=(
+                "Numero di città rimanenti nel mazzo per il quale è considerato esaurito, "
+                "e la partita termina."
+            )),
         'may swap': _OptDesc(
             name="Permetti scambio",
             description="I giocatori possono scambiare una città invece di piazzarla?"
         ),
         'only sat': _OptDesc(
             name="Pesca solo piazzabili",
-            description="Se questa opzione è selezionata, i giocatori pescano solo città che possono essere piazzate correttamente sul tavolo di gioco da qualche parte."
-        ),
+            description=(
+                "Se questa opzione è selezionata, i giocatori pescano solo città "
+                "che possono essere piazzate correttamente sul tavolo di gioco da qualche parte."
+            )),
         'wrap': _OptDesc(
             name="Continua longitudini",
-            description="Se questa opzione è selezionata, le longitudini continuano oltre i 180 gradi in ciascuna direzione. Per esempio, il Giappone (+138) può essere piazzato a ovest delle Hawaii (-155)."
-        ),
+            description=(
+                "Se questa opzione è selezionata, le longitudini continuano oltre i 180 gradi "
+                "in ciascuna direzione. Per esempio, il Giappone (+138) può essere piazzato "
+                "a ovest delle Hawaii (-155)."
+            )),
         'turn delay': _OptDesc(
             name="Pausa tra turni",
-            description="Effettua una pausa di questa durata in secondi dopo ogni turno prima di passare al prossimo giocatore."
-        ),
+            description=(
+                "Effettua una pausa di questa durata in secondi "
+                "dopo ogni turno prima di passare al prossimo giocatore."
+            )),
     }
 
 

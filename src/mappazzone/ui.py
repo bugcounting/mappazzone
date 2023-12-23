@@ -1,13 +1,14 @@
+"""This module contains the classes that define the graphical user interface of the game."""
+
 from typing import Optional, List, Tuple
 import logging
 import copy
-import platform
 import os
+import textwrap
 import tkinter as tk
 from tkinter import font as tkfont
 from idlelib.tooltip import Hovertip
 from PIL import Image, ImageTk
-import textwrap
 
 from .constants import FLAGS_DIR
 from .utils import DisplayName, monitor_size
@@ -18,8 +19,24 @@ from .game import Game
 
 
 class MappUI(tk.Tk):
+    """
+    The root of the graphical user interface.
+
+    Following the approach suggested in https://stackoverflow.com/a/49325719, 
+    this class offers methods to switch between different frames in the current GUI window.
+
+    Attributes:
+        _frame: The frame of the GUI currently displayed.
+        options: The options of the game.
+        locations: The deck of locations used by the game.
+        player_names: The names of the players of the game.
+        game: The game state.
+        messages: The messages for the current language.
+        logger: The logger for this class.
+    """
 
     _frame: Optional[tk.Frame]
+
     options: Options
     locations: Locations
     player_names: List[str]
@@ -28,7 +45,6 @@ class MappUI(tk.Tk):
     messages: Messages
     logger: logging.Logger
 
-    # https://stackoverflow.com/a/49325719
     def __init__(self, options: Options, locations: Locations):
         tk.Tk.__init__(self)
         self.log_setup()
@@ -38,10 +54,11 @@ class MappUI(tk.Tk):
         self.player_names = []
         self.title(self.messages['app name'])
         self._frame = None
-        self.logger.debug(f'{self.__class__} initialized.')
+        self.logger.debug('%s initialized.', self.__class__)
         self.switch_frame(StartMenu)
 
     def log_setup(self):
+        """Set up logger for this class."""
         self.logger = logging.getLogger(__name__)
 
     def switch_frame(self, frame_class):
@@ -51,22 +68,30 @@ class MappUI(tk.Tk):
             self._frame.destroy()
         self._frame = new_frame
         self._frame.pack()
-        self.logger.debug(f'Switching to frame {frame_class}.')
+        self.logger.debug('Switching to frame %s.', frame_class)
 
 
 class StartMenu(tk.Frame):
+    """
+    The game's main menu.
+
+    Attributes:
+        main: The root of the GUI.
+        player_entries: A list of Entry components, where the user types the player names.
+    """
     main: MappUI
 
-    player_entries: List
+    player_entries: List[tk.Entry]
 
     def __init__(self, main):
         tk.Frame.__init__(self, main)
         self.main = main
         self.player_entries = []
         self.build()
-        self.main.logger.debug(f'{self.__class__} built.')
+        self.main.logger.debug('%s built.', self.__class__)
 
     def show_rules(self):
+        """Open a new window displaying the rules of the game."""
         rules_window = tk.Toplevel(self.main)
         rules_window.title(self.main.messages['app name']
                            + ': '
@@ -80,17 +105,17 @@ class StartMenu(tk.Frame):
     def add_player(self) -> int:
         """Add player entry. Return row index of first available row below players."""
         row = len(self.player_entries)
-        ## If row is occupied, reposition the elements one row below
-        for r in reversed(range(row, row + 2)):
-            for w in self.grid_slaves(row=r):
-                w.grid(row=r + 1)
-        n = row + 1
-        label = tk.Label(self, text=self.main.messages['player name'].format(n))
+        # If row is occupied, reposition the elements one row below
+        for r_idx in reversed(range(row, row + 2)):
+            for widget in self.grid_slaves(row=r_idx):
+                widget.grid(row=r_idx + 1)
+        label = tk.Label(
+            self, text=self.main.messages['player name'].format(row + 1))
         label.grid(row=row, column=0, padx=5, pady=1, sticky='E')
         name = tk.Entry(self)
         name.grid(row=row, column=1, padx=5, pady=1, sticky='W')
         self.player_entries.append(name)
-        self.main.logger.debug(f'Player entry created.')
+        self.main.logger.debug('Player entry created.')
         return row + 1
 
     def start_game(self):
@@ -98,7 +123,7 @@ class StartMenu(tk.Frame):
         player_names = [p.get().strip() for p in self.player_entries]
         player_names = [p for p in player_names if p]
         if len(player_names) == 0:
-            self.main.logger.debug(f'No player names: game cannot start.')
+            self.main.logger.debug('No player names: game cannot start.')
             return
         self.main.player_names = player_names
         # Copy locations so that the current filtering options can be applied
@@ -110,25 +135,33 @@ class StartMenu(tk.Frame):
 
     def build(self):
         """Build list of player name slots, and main buttons."""
-        for n in range(2):
+        for _ in range(2):
             row = self.add_player()
         add_button = tk.Button(self, text=self.main.messages['add player'],
-                               command=lambda: self.add_player())
+                               command=self.add_player)
         add_button.grid(row=row, column=0, columnspan=1,
                         pady=1, padx=5, sticky='E')
         start_button = tk.Button(self, text=self.main.messages['start game'],
-                                 command=lambda: self.start_game())
+                                 command=self.start_game)
         start_button.grid(row=row, column=1, columnspan=1, pady=20, padx=10)
         row += 1
         opt_button = tk.Button(self, text=self.main.messages['options'],
                                command=lambda: self.main.switch_frame(OptionsMenu))
         opt_button.grid(row=row, column=0, columnspan=1, pady=10, padx=10)
         rules_button = tk.Button(self, text=self.main.messages['show rules'],
-                               command=lambda: self.show_rules())
+                                 command=self.show_rules)
         rules_button.grid(row=row, column=1, columnspan=1, pady=10, padx=10)
 
 
 class OptionsMenu(tk.Frame):
+    """
+    The game's option selection menu.
+
+    Attributes:
+        main: The root of the GUI.
+        options: The options of the game.
+    """
+
     main: MappUI
     options: Options
 
@@ -139,14 +172,16 @@ class OptionsMenu(tk.Frame):
         self.build()
 
     def build(self):
-        """List options with checkbox for boolean options and pull down menu for other kinds of options."""
+        """List options with checkbox for boolean options and pull down menu 
+        for other kinds of options."""
         row = -1
         for _, option in self.options.items():
             row += 1
             label = tk.Label(self, text=option.name)
             label.grid(row=row, column=0, padx=5, sticky='E')
-            tip = Hovertip(label, textwrap.fill(option.description, 25))
-            if type(option.value) is bool:
+            Hovertip(label, textwrap.fill(option.description, 25))
+            # pylint: disable=protected-access  # The UI is supposed to access _var.
+            if isinstance(option.value, bool):
                 option._var = tk.BooleanVar()
                 option._var.set(option.value)
                 choices = tk.Checkbutton(self, text='', variable=option._var,
@@ -155,7 +190,8 @@ class OptionsMenu(tk.Frame):
             else:
                 option._var = tk.StringVar()
                 option._var.set(str(option.value))
-                option._var.trace('w', lambda *args, o=option: o.set(o._var.get()))
+                option._var.trace('w', lambda *args,
+                                  o=option: o.set(o._var.get()))
                 choices = tk.OptionMenu(self, option._var,
                                         *[str(o) for o in option.choices])
             choices.grid(row=row, column=1, sticky='W')
@@ -166,6 +202,25 @@ class OptionsMenu(tk.Frame):
 
 
 class GameUI(tk.Frame):
+    """
+    The game's in-game GUI frame.
+
+    Attributes:
+        main: The root of the GUI.
+        game: The game state.
+        size: The size of the board (equal to game.board.opts.size).
+        board_frame: The frame displaying the board.
+        hand_frame: The frame displaying the current player's hand.
+        tile_len: The size of the square tiles in the board (in pixels).
+        location_width: The width of the location frames in the player's hand (in pixels).
+        location_height: The height of the location frames in the player's hand (in pixels).
+        selected: The index, among the list in the current player's hand, 
+                  of the currently selected location.
+        location_frames: A list of frames displaying the locations in the current player's hand.
+        """
+
+    # pylint: disable=too-many-instance-attributes  # Encapsulating the attributes in dataclasses doesn't seem necessary.
+
     main: MappUI
 
     game: Game
@@ -176,7 +231,7 @@ class GameUI(tk.Frame):
     tile_len: int
     location_width: int
     location_height: int
-    
+
     selected: Optional[int]
     location_frames: List[tk.Frame]
 
@@ -184,7 +239,7 @@ class GameUI(tk.Frame):
         tk.Frame.__init__(self, main)
         self.main = main
         self.game = main.game
-        self.size = self.game.board.size
+        self.size = self.game.board.opts.size
         self.location_frames = []
         self.selected = None
         # Maximize window
@@ -218,10 +273,13 @@ class GameUI(tk.Frame):
                 self.location_height = location_height
                 break
             frac -= 0.01
-        self.main.logger.debug(f'Screen geometry: W={monitor_width} x H={monitor_height} pixels')
-        self.main.logger.debug(f'Tile size: {tile_len} pixels per tile, {self.size * tile_len} overall')
-        self.main.logger.debug(f'Remaining width: {remaining_width} pixels')
-        self.main.logger.debug(f'Location geometry: W={location_width} x H={location_height} pixels')
+        self.main.logger.debug(
+            'Screen geometry: W=%d x H=%d pixels', monitor_width, monitor_height)
+        self.main.logger.debug(
+            'Tile size: %d pixels per tile, %d overall', tile_len, self.size * tile_len)
+        self.main.logger.debug('Remaining width: %d pixels', remaining_width)
+        self.main.logger.debug(
+            'Location geometry: W=%d x H=%d pixels', location_width, location_height)
 
     def turn(self):
         """Check if the game is over or whether the current turn should be played."""
@@ -244,9 +302,8 @@ class GameUI(tk.Frame):
             self.main.logger.debug('Location unselected.')
         else:
             self.selected = selected
-            self.main.logger.debug(f'Location {self.selected} selected.')
-        for k in range(len(self.location_frames)):
-            location_frame = self.location_frames[k]
+            self.main.logger.debug('Location %d selected.', self.selected)
+        for k, location_frame in enumerate(self.location_frames):
             if k == self.selected:
                 # Highlight the selected location
                 location_frame.config(highlightbackground='red')
@@ -257,25 +314,29 @@ class GameUI(tk.Frame):
     def place_selected(self, x: int, y: int):
         """Try to place the selected location on the board at
         coordinates `x`, `y`."""
+        # pylint: disable=invalid-name  # x and y are valid names for coordinate variables.
         try:
             player = self.game.current_player()
             location = player.hand[self.selected]
             result = self.game.place(player, location, x, y)
         except IndexError:
             # `self.selected` is out of bounds
-            self.main.logger.debug('Selected location {self.selected} is out of bounds: player {player.name} only has {len(player.hand)} locations in hand.')
+            self.main.logger.debug(
+                'Selected location %s is out of bounds: player %s only has %d locations in hand.',
+                str(self.selected), player.name, len(player.hand))
             return
         except TypeError:
             # `self.selected` is None
             self.main.logger.debug('Selected location is None: cannot place.')
             return
-        except ValueError:
+        except ValueError as e:
             # The cell at `x`, `y` is occupied
             self.main.logger.debug(e)
             return
         if len(result) > 0:
             # Highlight wrong coordinates
-            self.main.logger.debug('Highlight wrong coordinates: {result}.')
+            self.main.logger.debug(
+                'Highlight wrong coordinates: %s.', str(result))
             placed_button = self.location_on_board(location,
                                                    highlight=result, highlightcol='red')
         else:
@@ -306,8 +367,9 @@ class GameUI(tk.Frame):
         self.hand_frame = tk.Frame(self, pady=30)
         self.hand_frame.pack()
         gameover = self.main.game.gameover()
+        gameover_reason = self.main.messages[gameover]
         gameover_label = tk.Label(self.hand_frame,
-                                  text=textwrap.fill(gameover, 40),
+                                  text=textwrap.fill(gameover_reason, 40),
                                   font=tkfont.Font(size=16))
         gameover_label.grid(row=0, column=0, columnspan=2, pady=20, padx=20)
         results = self.main.game.results()
@@ -315,25 +377,25 @@ class GameUI(tk.Frame):
         name_label = DisplayName(longest_name, int(0.5 * self.remaining_width),
                                  padx=0, truncate=False)
         fontsize = min(24, name_label.fontsize())
-        for n in range(len(results)):
-            player = results[n]
+        n_player = 0
+        for n_player, player in enumerate(results):
             name = player.name
             n_label = tk.Label(self.hand_frame,
-                               text=f'{n + 1}:',
+                               text=f'{n_player + 1}:',
                                font=tkfont.Font(size=fontsize))
-            n_label.grid(row=n + 1, column=0, padx=5, sticky='E')
+            n_label.grid(row=n_player + 1, column=0, padx=5, sticky='E')
             name_label = tk.Label(self.hand_frame,
                                   text=name,
                                   font=tkfont.Font(size=fontsize))
-            name_label.grid(row=n + 1, column=1, padx=5, sticky='W')
+            name_label.grid(row=n_player + 1, column=1, padx=5, sticky='W')
         back_button = tk.Button(self.hand_frame,
                                 text=self.main.messages['back to main'],
                                 command=lambda: self.main.switch_frame(StartMenu))
-        back_button.grid(row=n + 2, column=0, pady=20, sticky='S')
+        back_button.grid(row=n_player + 2, column=0, pady=20, sticky='S')
         quit_button = tk.Button(self.hand_frame, text=self.main.messages['quit'],
-                                command=lambda: self.main.destroy())
-        quit_button.grid(row=n + 2, column=1, pady=20, sticky='S')
-        
+                                command=self.main.destroy)
+        quit_button.grid(row=n_player + 2, column=1, pady=20, sticky='S')
+
     def draw_player(self):
         """Display the information about the current player and their hand."""
         self.hand_frame = tk.Frame(self, pady=30)
@@ -351,15 +413,15 @@ class GameUI(tk.Frame):
         instructions = DisplayName(instructions,
                                    self.remaining_width, padx=0, truncate=False)
         instructions_label = tk.Label(self.hand_frame,
-                                     text=str(instructions),
-                                     font=tkfont.Font(size=instructions.fontsize()))
+                                      text=str(instructions),
+                                      font=tkfont.Font(size=instructions.fontsize()))
         instructions_label.grid(row=1, column=0, columnspan=2, pady=5)
-        for k in range(len(player.hand)):
-            location = player.hand[k]
+        for k, location in enumerate(player.hand):
             row, col = k // 2, k % 2
             location_frame = self.location_in_hand(location)
             location_frame.grid(row=2+row, column=col, pady=10, padx=10)
-            location_frame.bind("<Button-1>", lambda e, k=k: self.set_selected(k))
+            location_frame.bind("<Button-1>", lambda e,
+                                k=k: self.set_selected(k))
             location_frame.bind("<Double-Button-1>",
                                 lambda e, k=k: self.swap_selected(k))
             self.location_frames.append(location_frame)
@@ -368,22 +430,27 @@ class GameUI(tk.Frame):
         """Display the information about the current board."""
         self.board_frame = tk.Frame(self, padx=10)
         self.board_frame.pack(side='left', anchor='center')
+        # pylint: disable=invalid-name  # x and y are valid names for coordinate variables.
         for x in range(self.size):
             for y in range(self.size):
-                location_frame = self.location_on_board(self.game.board.get(x, y))
+                location_frame = self.location_on_board(
+                    self.game.board.get(x, y))
                 location_frame.grid(row=y, column=x)
                 location_frame.bind("<Button-1>",
                                     lambda e, x=x, y=y: self.place_selected(x, y))
 
     def location_on_board(self, location: Optional[Location],
-                          highlight: List[Direction]=[],
-                          highlightcol: str='red') -> tk.Button:
+                          highlight: Optional[List[Direction]] = None,
+                          highlightcol: str = 'red') -> tk.Button:
         """Build a button with information about `location` and add it
         to `self.board_frame` without placing it. For each direction
         in `highlight`, display the corresponding direction in color
         `highlightcol`."""
-        ## Add blank image to button, so that width and height can
-        ## be specified in pixels
+        # pylint: disable=too-many-locals  # More locals helps readability in this function with simple logic.
+        if highlight is None:
+            highlight = []
+        # Add blank image to button, so that width and height can
+        # be specified in pixels
         tile_len = self.tile_len
         blank = tk.PhotoImage(width=1, height=1)
         location_frame = tk.Button(self.board_frame,
@@ -398,7 +465,7 @@ class GameUI(tk.Frame):
         if location is not None:
             location_name = DisplayName(location.city, tile_len)
             location_label = tk.Label(location_frame, text=location_name,
-                                      font=tkfont.Font(size=location_name.fontsize()))
+                                      font=tkfont.Font(size=min(38, location_name.fontsize())))
             Hovertip(location_label, location_name.name)
             location_label.grid(row=0, column=0, columnspan=2)
             country_name = DisplayName(location.country, 3/4 * tile_len)
@@ -436,7 +503,7 @@ class GameUI(tk.Frame):
             else:
                 direction = self.main.messages['direction null']
             latitude_direction = tk.Label(location_frame, text=direction,
-                                           font=tkfont.Font(size=direction_fontsize))
+                                          font=tkfont.Font(size=direction_fontsize))
             latitude_direction.grid(row=3, column=1, pady=0)
         return location_frame
 
@@ -461,10 +528,11 @@ class GameUI(tk.Frame):
         Hovertip(location_label, location_name.name)
         location_label.grid(row=0, column=0, columnspan=2)
         # Flag and Country, Continent
-        ## Flag canvas
+        # Flag canvas
         flag_w = int(0.2 * cell_width)
         flag_h = int(2/3 * flag_w)
-        flag_image = self.get_flag_image(location.country_iso3, size=(flag_w, flag_h))
+        flag_image = self.get_flag_image(
+            location.country_iso3, size=(flag_w, flag_h))
         flag_canvas = tk.Canvas(location_frame,
                                 width=flag_w, height=flag_h, borderwidth=0)
         flag_canvas.create_image(flag_w // 2, flag_h // 2,
@@ -472,7 +540,7 @@ class GameUI(tk.Frame):
         # Keep a reference to the image to prevent garbage-collection
         flag_canvas.flag = flag_image
         flag_canvas.grid(row=1, column=0, rowspan=2, padx=20)
-        ## Country, Continent
+        # Country, Continent
         country_name = DisplayName(location.country, int(0.5 * cell_width))
         country_label = tk.Label(location_frame, text=country_name,
                                  font=tkfont.Font(size=country_name.fontsize()))
@@ -483,7 +551,7 @@ class GameUI(tk.Frame):
         continent_label = tk.Label(location_frame, text=continent_name,
                                    font=tkfont.Font(size=min(continent_name.fontsize(),
                                                              country_name.fontsize())))
-        Hovertip(continent_label, continent_name.name)        
+        Hovertip(continent_label, continent_name.name)
         continent_label.grid(row=2, column=1, padx=20)
         return location_frame
 
@@ -491,8 +559,10 @@ class GameUI(tk.Frame):
         """Load flag image for country with code `iso3`, and resize it to `size`."""
         path = os.path.join(FLAGS_DIR, f'{iso3.upper()}.png')
         if not os.path.exists(path):
-            self.main.logger.debug(f"Couldn't find a flag for country {iso3}.")
+            self.main.logger.debug(
+                "Couldn't find a flag for country %s.", iso3)
             return tk.PhotoImage(width=size[0], height=size[1])
         image = Image.open(path)
+        # pylint: disable=no-member  # Image.LANCZOS is a valid attribute.
         image = image.resize(size, Image.LANCZOS)
         return ImageTk.PhotoImage(image)

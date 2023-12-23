@@ -1,22 +1,26 @@
+"""This module provides support for UI messages in multiple languages."""
+
 import os
 import logging
 
 from .constants import ENV_LANGUAGE
 
 
-class Messages_:
+class EmptyMessages:  # pylint: disable=too-few-public-methods
+    """A dictionary of UI messages, whose keys are message names."""
 
     def __getitem__(self, message_name: str) -> str:
         return self._MESSAGES[message_name]
 
     def __init__(self):
         logger = logging.getLogger(__name__)
+        # If there exist an attribute _TRANSLATIONS, use it to update _MESSAGES.
         try:
             for key, message in self._TRANSLATIONS.items():
                 if key in self._MESSAGES:
                     self._MESSAGES[key] = message
                 else:
-                    logger.error(f"Message '{key}' not found.")
+                    logger.error("Message '%s' not found.", key)
         except AttributeError:
             pass
 
@@ -37,12 +41,18 @@ class Messages_:
         'direction null': '',
         'direction north': '',
         'direction south': '',
+        'game over rounds': '',
+        'game over score': '',
+        'game over hand': '',
+        'game over placed': '',
+        'game over deck': '',
         'how to play': '',
     }
 
 
-class MessagesEN(Messages_):
-    
+class MessagesEN(EmptyMessages):  # pylint: disable=too-few-public-methods
+    """Dictionary of UI messages in English."""
+
     _TRANSLATIONS = {
         'app name': 'Mappazzone!',
         'player name': 'Player {}',
@@ -53,13 +63,22 @@ class MessagesEN(Messages_):
         'show rules': 'How to play?',
         'back to main': 'Back to main',
         'quit': 'Quit',
-        'place instructions': 'Click on a location and then on an empty cell on the board to place it.',
+        'place instructions': (
+            'Click on a location and then on an empty cell on the board to place it.'
+        ),
         'swap instructions': 'Double-click on a location to swap it with one in the deck.',
         'direction east': 'E',
         'direction west': 'W',
         'direction null': '',
         'direction north': 'N',
         'direction south': 'S',
+        'game over rounds': 'The game is over after reaching the maximum number of rounds.',
+        'game over score': 'The game is over after a player has placed all their locations.',
+        'game over hand': 'The game is over after a player has too many locations in their hand.',
+        'game over placed': (
+            'The game is over after a maximum number of locations have been placed on the board.'
+        ),
+        'game over deck': 'The game is over because the deck is empty.',
         'how to play': """
         Mappazzone is a geolocalization board game.
 
@@ -117,8 +136,9 @@ class MessagesEN(Messages_):
     }
 
 
-class MessagesIT(Messages_):
-    
+class MessagesIT(EmptyMessages):  # pylint: disable=too-few-public-methods
+    """Dictionary of UI messages in Italian."""
+
     _TRANSLATIONS = {
         'app name': 'Mappazzone!',
         'player name': 'Giocatore {}',
@@ -129,13 +149,25 @@ class MessagesIT(Messages_):
         'show rules': 'Come si gioca?',
         'back to main': 'Menu principale',
         'quit': 'Esci',
-        'place instructions': 'Clicca su una città e poi su una cella vuota nel tavolo di gioco per piazzarla.',
+        'place instructions': (
+            'Clicca su una città e poi su una cella vuota nel tavolo di gioco per piazzarla.'
+        ),
         'swap instructions': 'Fai doppio clic su una città per scambiarla con una dal mazzo.',
         'direction east': 'E',
         'direction west': 'O',
         'direction null': '',
         'direction north': 'N',
         'direction south': 'S',
+        'game over rounds': 'La partita è finita dopo che sono passati il numero massimo di turni.',
+        'game over score': (
+            'La partita è finita dopo che un giocatore ha piazzato tutte le sue città.'
+        ),
+        'game over hand': 'La partita è finita dopo che un giocatore ha troppe città in mano.',
+        'game over placed': (
+            'La partita è finita dopo che il numero massimo di città '
+            'sono state piazzate sul tavolo di gioco.'
+        ),
+        'game over deck': 'La partita è finita perché il mazzo è esaurito.',
         'how to play': """
         Mappazzone è un gioco di geolocalizzazione.
 

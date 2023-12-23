@@ -31,7 +31,7 @@ platform-specific:
 Here is how to install them in Debian/Ubuntu Linux distributions:
 
 ```bash
-sudo apt install python3-tk idle3 python3-pil python3-pil.imagetk
+sudo apt install python3-venv python3-tk idle3 python3-pil python3-pil.imagetk
 ```
 
 Then, check that you have the building tools installed and up to date:

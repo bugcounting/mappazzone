@@ -1,8 +1,8 @@
-import pytest
 import sys
 import os
 import time
 import tkinter as tk
+import pytest
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../src')
 
 from mappazzone.constants import ENV_LANGUAGE
@@ -55,11 +55,11 @@ class TestUI:
                         population=2872800, identifier=1380382862,
                         continent=Continent.EU, capital=True)
         reykjavik = Location(city='Reykjavík', city_ascii='Reykjavik',
-                        longitude=-21.9400, latitude=64.1467,
-                        country='Iceland',
-                        country_iso2='IS', country_iso3='ISL',
-                        population=135688, identifier=1352327190,
-                        continent=Continent.EU, capital=True)
+                             longitude=-21.9400, latitude=64.1467,
+                             country='Iceland',
+                             country_iso2='IS', country_iso3='ISL',
+                             population=135688, identifier=1352327190,
+                             continent=Continent.EU, capital=True)
         app.game.board.set_center(rome)
         player = app.game.players[0]
         player.hand = [reykjavik]

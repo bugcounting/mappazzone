@@ -1,6 +1,6 @@
-import pytest
 import sys
 import os
+import pytest
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../src')
 
 from mappazzone.constants import ENV_LANGUAGE
@@ -35,7 +35,8 @@ class TestPlayer:
         p = self.player()
         loc = p.hand[0]
         old_score = p.score()
-        loc3 = Location('C3', '', -20, -10, 'country', '', '', 0, 1, Continent.NA)
+        loc3 = Location('C3', '', -20, -10, 'country',
+                        '', '', 0, 1, Continent.NA)
         p.swap(loc, loc3)
         assert p.score() == old_score
         assert loc not in p.hand
@@ -48,36 +49,50 @@ class TestGame:
 
     def game(self) -> Game:
         locations_list = [
-            Location('EU', '', 10, 0, 'country', '', '', 0, 1, Continent.EU, True),
-            Location('EU2', '', -10, 0, 'country', '', '', 0, 1, Continent.EU, False),
-            Location('AN', '', 10, 0, 'country', '', '', 0, 1, Continent.AN, True),
-            Location('AN2', '', 20, 0, 'country', '', '', 0, 1, Continent.AN, False),
-            Location('AS', '', 10, 30, 'country', '', '', 0, 1, Continent.AS, True),
-            Location('AS2', '', 20, 40, 'country', '', '', 0, 1, Continent.AS, False),
-            Location('NA', '', 10, 30, 'country', '', '', 0, 1, Continent.NA, True),
-            Location('NA2', '', 20, 40, 'country', '', '', 0, 1, Continent.NA, False),
-            Location('SA', '', 90, -30, 'country', '', '', 0, 1, Continent.SA, True),
-            Location('SA2', '', 20, -40, 'country', '', '', 0, 1, Continent.SA, False),
-            Location('OC', '', -90, -30, 'country', '', '', 0, 1, Continent.OC, True),
-            Location('OC2', '', -20, -40, 'country', '', '', 0, 1, Continent.OC, False),
-            Location('AF', '', 10, 30, 'country', '', '', 0, 1, Continent.AF, True),
-            Location('AF2', '', 20, 40, 'country', '', '', 0, 1, Continent.AF, False)
+            Location('EU', '', 10, 0, 'country', '',
+                     '', 0, 1, Continent.EU, True),
+            Location('EU2', '', -10, 0, 'country', '',
+                     '', 0, 1, Continent.EU, False),
+            Location('AN', '', 10, 0, 'country', '',
+                     '', 0, 1, Continent.AN, True),
+            Location('AN2', '', 20, 0, 'country', '',
+                     '', 0, 1, Continent.AN, False),
+            Location('AS', '', 10, 30, 'country', '',
+                     '', 0, 1, Continent.AS, True),
+            Location('AS2', '', 20, 40, 'country', '',
+                     '', 0, 1, Continent.AS, False),
+            Location('NA', '', 10, 30, 'country', '',
+                     '', 0, 1, Continent.NA, True),
+            Location('NA2', '', 20, 40, 'country', '',
+                     '', 0, 1, Continent.NA, False),
+            Location('SA', '', 90, -30, 'country', '',
+                     '', 0, 1, Continent.SA, True),
+            Location('SA2', '', 20, -40, 'country', '',
+                     '', 0, 1, Continent.SA, False),
+            Location('OC', '', -90, -30, 'country',
+                     '', '', 0, 1, Continent.OC, True),
+            Location('OC2', '', -20, -40, 'country',
+                     '', '', 0, 1, Continent.OC, False),
+            Location('AF', '', 10, 30, 'country', '',
+                     '', 0, 1, Continent.AF, True),
+            Location('AF2', '', 20, 40, 'country', '',
+                     '', 0, 1, Continent.AF, False)
         ]
         locations = Locations(content=locations_list)
         old_locations = len(locations)
         options = Options()
         options.set_option('capitals only', False)
         options.set_option('initial cities', 2)
-        game =  Game(options=options,
-                     players=['P1', 'P2'],
-                     locations=locations)
+        game = Game(options=options,
+                    players=['P1', 'P2'],
+                    locations=locations)
         assert len(game.deck) == old_locations - (1 + 2 * 2)
         return game
 
     def test_init(self):
         game = self.game()
         assert game.board.violations() == []
-        
+
     def test_swap(self):
         game = self.game()
         p1, p2 = game.players
@@ -97,7 +112,8 @@ class TestGame:
         loc1 = p1.hand[0]
         center = Location('X', '', loc1.longitude - 10, loc1.latitude + 10,
                           'country', '', '', 0, 1, Continent.EU, False)
-        assert center.before(loc1, direction=Direction.LONGITUDE, tolerance=0.0)
+        assert center.before(
+            loc1, direction=Direction.LONGITUDE, tolerance=0.0)
         assert center.before(loc1, direction=Direction.LATITUDE, tolerance=0.0)
         game.board.set_center(center)
         x, y = game.board.coords(1, 1, centered=True)
@@ -118,14 +134,5 @@ class TestGame:
         result = game.place(p1, loc1, x, y)
         assert len(result) == 2
         fact = len(result) if game.options['draw per mistake'] else 1
-        assert p1.score() == old_score - 1 + game.options['draw when fail'] * fact
-
-        
-
-        
-        
-    
-        
-
-        
-        
+        assert p1.score() == old_score - 1 + \
+            game.options['draw when fail'] * fact

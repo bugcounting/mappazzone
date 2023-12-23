@@ -1,6 +1,6 @@
-import pytest
 import sys
 import os
+import pytest
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../src')
 
 from mappazzone.constants import ENV_LANGUAGE
@@ -18,12 +18,14 @@ class TestLocation:
         assert loc2.before(loc1, Direction.LONGITUDE, tolerance=10.0)
         assert not loc2.before(loc1, Direction.LONGITUDE, tolerance=1.0)
         assert not loc2.before(loc1, Direction.LONGITUDE, tolerance=0.0)
-        loc3 = Location('C3', '', -30, 0, 'country', '', '', 0, 1, Continent.EU)
+        loc3 = Location('C3', '', -30, 0, 'country',
+                        '', '', 0, 1, Continent.EU)
         assert loc3.before(loc1, Direction.LONGITUDE, tolerance=0.0)
         assert loc3.before(loc2, Direction.LONGITUDE, tolerance=0.0)
         assert not loc2.before(loc3, Direction.LONGITUDE, tolerance=0.0)
         assert not loc1.before(loc3, Direction.LONGITUDE, tolerance=0.0)
-        loc4 = Location('C4', '', -40, 0, 'country', '', '', 0, 1, Continent.EU)
+        loc4 = Location('C4', '', -40, 0, 'country',
+                        '', '', 0, 1, Continent.EU)
         assert loc4.before(loc3, Direction.LONGITUDE, tolerance=0.0)
         assert loc3.before(loc4, Direction.LONGITUDE, tolerance=15.0)
         assert not loc3.before(loc4, Direction.LONGITUDE, tolerance=1.0)
@@ -36,12 +38,14 @@ class TestLocation:
         assert loc2.before(loc1, Direction.LATITUDE, tolerance=10.0)
         assert loc2.before(loc1, Direction.LATITUDE, tolerance=1.0)
         assert loc2.before(loc1, Direction.LATITUDE, tolerance=0.0)
-        loc3 = Location('C3', '', 0, -30, 'country', '', '', 0, 1, Continent.EU)
+        loc3 = Location('C3', '', 0, -30, 'country',
+                        '', '', 0, 1, Continent.EU)
         assert loc1.before(loc3, Direction.LATITUDE, tolerance=0.0)
         assert loc2.before(loc3, Direction.LATITUDE, tolerance=0.0)
         assert not loc3.before(loc2, Direction.LATITUDE, tolerance=0.0)
         assert not loc3.before(loc1, Direction.LATITUDE, tolerance=0.0)
-        loc4 = Location('C4', '', 0, -40, 'country', '', '', 0, 1, Continent.EU)
+        loc4 = Location('C4', '', 0, -40, 'country',
+                        '', '', 0, 1, Continent.EU)
         assert loc3.before(loc4, Direction.LATITUDE, tolerance=0.0)
         assert loc4.before(loc3, Direction.LATITUDE, tolerance=15.0)
         assert not loc4.before(loc3, Direction.LATITUDE, tolerance=1.0)
@@ -51,20 +55,34 @@ class TestLocations:
 
     def locations(self):
         return [
-            Location('EU', '', 10, 0, 'country', '', '', 0, 1, Continent.EU, True),
-            Location('EU2', '', -10, 0, 'country', '', '', 0, 1, Continent.EU, False),
-            Location('AN', '', 10, 0, 'country', '', '', 0, 1, Continent.AN, True),
-            Location('AN2', '', 20, 0, 'country', '', '', 0, 1, Continent.AN, False),
-            Location('AS', '', 10, 30, 'country', '', '', 0, 1, Continent.AS, True),
-            Location('AS2', '', 20, 40, 'country', '', '', 0, 1, Continent.AS, False),
-            Location('NA', '', 10, 30, 'country', '', '', 0, 1, Continent.NA, True),
-            Location('NA2', '', 20, 40, 'country', '', '', 0, 1, Continent.NA, False),
-            Location('SA', '', 90, -30, 'country', '', '', 0, 1, Continent.SA, True),
-            Location('SA2', '', 20, -40, 'country', '', '', 0, 1, Continent.SA, False),
-            Location('OC', '', -90, -30, 'country', '', '', 0, 1, Continent.OC, True),
-            Location('OC2', '', -20, -40, 'country', '', '', 0, 1, Continent.OC, False),
-            Location('AF', '', 10, 30, 'country', '', '', 0, 1, Continent.AF, True),
-            Location('AF2', '', 20, 40, 'country', '', '', 0, 1, Continent.AF, False)
+            Location('EU', '', 10, 0, 'country', '',
+                     '', 0, 1, Continent.EU, True),
+            Location('EU2', '', -10, 0, 'country', '',
+                     '', 0, 1, Continent.EU, False),
+            Location('AN', '', 10, 0, 'country', '',
+                     '', 0, 1, Continent.AN, True),
+            Location('AN2', '', 20, 0, 'country', '',
+                     '', 0, 1, Continent.AN, False),
+            Location('AS', '', 10, 30, 'country', '',
+                     '', 0, 1, Continent.AS, True),
+            Location('AS2', '', 20, 40, 'country', '',
+                     '', 0, 1, Continent.AS, False),
+            Location('NA', '', 10, 30, 'country', '',
+                     '', 0, 1, Continent.NA, True),
+            Location('NA2', '', 20, 40, 'country', '',
+                     '', 0, 1, Continent.NA, False),
+            Location('SA', '', 90, -30, 'country', '',
+                     '', 0, 1, Continent.SA, True),
+            Location('SA2', '', 20, -40, 'country', '',
+                     '', 0, 1, Continent.SA, False),
+            Location('OC', '', -90, -30, 'country',
+                     '', '', 0, 1, Continent.OC, True),
+            Location('OC2', '', -20, -40, 'country',
+                     '', '', 0, 1, Continent.OC, False),
+            Location('AF', '', 10, 30, 'country', '',
+                     '', 0, 1, Continent.AF, True),
+            Location('AF2', '', 20, 40, 'country', '',
+                     '', 0, 1, Continent.AF, False)
         ]
 
     def test_keep(self):
@@ -91,7 +109,7 @@ class TestLocations:
         len_locs = len(locs)
         locs.pick(3)
         assert len(locs) == len_locs - 3
-        
+
     def test_get(self):
         locs = Locations(content=self.locations())
         assert locs.get('NA')

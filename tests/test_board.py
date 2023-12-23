@@ -15,16 +15,16 @@ class TestBoard:
         center = Location('center', '', 0, 0, 'country', 'iso2', 'iso3', 0, 0,
                           Continent.EU)
         board = Board(center, Board.BoardOptions(10))
-        assert len(board.grid) == board.size
-        assert len(board.grid[0]) == board.size
+        assert len(board.grid) == board.opts.size
+        assert len(board.grid[0]) == board.opts.size
         assert board.get_center() == center
-        assert board.grid[board.center_x][board.center_y] == center
+        assert board.grid[board.opts.center_x][board.opts.center_y] == center
 
     def test_no_violations(self):
         center = Location('center', '', 0, 0, 'country', 'iso2', 'iso3', 0, 0,
                           Continent.AS)
         board = Board(center, Board.BoardOptions(10))
-        assert board.center_x == 5 and board.center_y == 5
+        assert board.opts.center_x == 5 and board.opts.center_y == 5
         assert not board.violations()
         n = Location('N', '', 0, 50, 'country', 'iso2', 'iso3', 0, 0, Continent.EU)
         board.put(n, *board.coords(0, -4, centered=True))

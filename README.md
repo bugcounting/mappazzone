@@ -46,8 +46,8 @@ Let's create a virtual environment `mpz` to easily install the project
 and its dependencies.
 
 ```bash
-python3 -m venv mappazzone
-source mappazzone/bin/activate
+python3 -m venv mpz
+source mpz/bin/activate
 ```
 
 ### Building the project

@@ -11,13 +11,47 @@ The easiest way to install *Mappazzone!* is by using one of the
 
 1. Download and unpack the archive bundle for your operating system.
 
-2. Launch the executable `mappazzone` in the unpacked directory.
+2. Launch the executable `mappazzone` (or `mappazzone.exe`) in the
+   unpacked directory.
 
 `mappazzone` tries to determine the system's language, and uses it for
 its UI. This detection does not always works, in which case it falls
 back to English. Alternatively, you can specify your language using
 the `--language` command-line option. Currently, there is only support
 for English (`EN`) and Italian (`IT`).
+
+### Running in Windows
+
+Unfortunately, there are a few complications in Windows, where Windows
+Defender [flags the Pyinstaller executable as a
+trojan](https://stackoverflow.com/questions/44377666/pyinstaller-exe-throws-windows-defender-no-publisher)
+:-(.
+
+A workaround for that is [adding a security
+exception](https://stackoverflow.com/a/54734084):
+
+1. Go to `Start > Settings > Update & Security > Windows Security >
+   Virus & threat protection`.
+   
+2. Select `Manage settings`. Under `Exclusions` select `Add or remove
+   exclusions`.
+   
+3. Select `Add an exclusion > Folder`, and select the whole folder
+   that you unpacked from the bundle.
+   
+Now, you should be able to run `mappazzone.exe` without issues.
+However, if you try to add a shortcut to `mappazzone.exe` from a
+location that is outside the folder with the exception, the shortcut
+will still be blocked by Defender. Thus, either put the shortcut
+within the same excluded folder, or add an exception for the shortcut
+file.
+
+Finally, if you want to pass command line options to `mappazzone.exe`,
+you should edit the `Target` field of the shortcut (`Right click >
+Properties > Shortcut tab`). Put the full path to `mappazzone.exe`
+between double quotation marks, and then add the command-line options
+outside the quotation marks. For example:
+`"C:\Users\...\mappazzone\mappazzone.exe" --language IT`.
 
 ## Installation
 
@@ -48,8 +82,8 @@ does not mess with your system's main libraries.
 ```bash
 conda create --name mpz
 conda activate mpz
-conda install python=3.10 pillow
-# Add support for freetype fonts, which look nicer.
+conda install python=3.10 pillow  # Dropping =3.10 should also work
+# On Linux, add support for freetype fonts, which look nicer.
 # The installer may ask you to downgrade, which is OK.
 conda install -c conda-forge tk=*=xft_*
 ```
@@ -61,7 +95,10 @@ and its dependencies.
 
 ```bash
 python3 -m venv mpz
+# Linux/macOS
 source mpz/bin/activate
+# Windows
+mpz\Scripts\activate.bat
 ```
 
 Finally, install the building tools in the virtual environment:
@@ -92,7 +129,7 @@ python3 -m pip install "$MAPPAZZONE"
 ```
 
 This will install all dependencies, as well as a command `mappazzone`
-that starts the game.
+(or `mappazzone.exe`) that starts the game.
 
 2. If you want to run the tests as well, build target `dev` and do an
    "editable" install with option `-e`:
@@ -143,8 +180,8 @@ Unless it is explicitly disabled with the `--nolog` command-line
 option, `mappazzone` writes a log of operations in the current user
 `$USER`'s log directory. This is
 `/home/$USER/.local/state/mappazzone/log/` in Linux,
-`C:\Users\$USER\AppData\Local\mappazzone\Logs\` in Windows, and
-`/Users/$USER/Library/Logs/mappazzone/` in macOS.
+`C:\Users\$USER\AppData\Local\mappazzone\mappazzone\Logs\` in Windows,
+and `/Users/$USER/Library/Logs/mappazzone/` in macOS.
 
 `mappazzone` saves several log files, one per run. The latest log file
 is always named `mappazzone.log`. If you find a bug, report it with

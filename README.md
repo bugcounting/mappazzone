@@ -13,6 +13,12 @@ The easiest way to install *Mappazzone!* is by using one of the
 
 2. Launch the executable `mappazzone` in the unpacked directory.
 
+`mappazzone` tries to determine the system's language, and uses it for
+its UI. This detection does not always works, in which case it falls
+back to English. Alternatively, you can specify your language using
+the `--language` command-line option. Currently, there is only support
+for English (`EN`) and Italian (`IT`).
+
 ## Installation
 
 Building and installing the project should be possible on any system
@@ -32,6 +38,23 @@ Here is how to install them in Debian/Ubuntu Linux distributions:
 ```bash
 sudo apt install python3-venv python3-tk idle3 python3-pil python3-pil.imagetk
 ```
+
+Alternatively, install
+[Miniconda](https://docs.conda.io/projects/miniconda/en/latest/miniconda-install.html),
+create an environment `mpz`, and then install the dependencies within
+it. This works on every system where you can install Anaconda, and
+does not mess with your system's main libraries.
+
+```bash
+conda create --name mpz
+conda activate mpz
+conda install python=3.10 pillow
+# Add support for freetype fonts, which look nicer.
+# The installer may ask you to downgrade, which is OK.
+conda install -c conda-forge tk=*=xft_*
+```
+
+### Virtual environment
 
 Let's create a virtual environment `mpz` to easily install the project
 and its dependencies.
@@ -113,3 +136,19 @@ This creates a self-contained directory `mappazzone` under
 `$MAPPAZZONE/dist` with all dependencies (including a Python
 interpreter). Run the script `mappazzone` in this bundle to run the
 game.
+
+## Debugging
+
+Unless it is explicitly disabled with the `--nolog` command-line
+option, `mappazzone` writes a log of operations in the current user
+`$USER`'s log directory. This is
+`/home/$USER/.local/state/mappazzone/log/` in Linux,
+`C:\Users\$USER\AppData\Local\mappazzone\Logs\` in Windows, and
+`/Users/$USER/Library/Logs/mappazzone/` in macOS.
+
+`mappazzone` saves several log files, one per run. The latest log file
+is always named `mappazzone.log`. If you find a bug, report it with
+the corresponding log file.
+
+To change to `$DIR` the location where log files are saved, use the
+`--logdir $DIR` command-line option.

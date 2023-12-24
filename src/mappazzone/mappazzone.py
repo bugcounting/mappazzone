@@ -26,7 +26,7 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 def log_setup(nolog=False, logdir=None):
     """Set up logger for the whole application."""
     if logdir is None:
-        log_dir = Path(platformdirs.user_config_dir(APP_NAME))
+        log_dir = Path(platformdirs.user_log_dir(APP_NAME))
     else:
         log_dir = Path(logdir)
     log_dir.mkdir(parents=True, exist_ok=True)

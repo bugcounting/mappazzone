@@ -194,12 +194,13 @@ class Board:
                                         first, second)]
         return []
 
-    def try_place(self, location: Location, x: int, y: int) -> List[Direction]:
+    def try_place(self, location: Location, x: int, y: int, place: bool = True) -> List[Direction]:
         """Try to place `location` at absolute coordinates `x`, `y` on
         the board. If doing so does not break the invariant, return
         []. Otherwise, removes `location` from the board and return a
         list of directions where the placement would have violated the
-        invariant."""
+        invariant. If `place` is True, `location` will not be placed 
+        on the board even if it does not break the invariant."""
         self._logger.debug('Try placement of %s at x=%s, y=%s', location, x, y)
         current = self.get(x=x, y=y)
         if current is not None:
@@ -214,4 +215,20 @@ class Board:
             self._logger.debug(
                 'Violations found: removing location from x=%s, y=%s', x, y)
             self.remove(x=x, y=y)
+        elif not place:
+            self._logger.debug('Removing location from x=%s, y=%s', x, y)
+            self.remove(x=x, y=y)
         return [v.direction for v in check]
+
+    def can_place(self, location: Location) -> bool:
+        """Can `location` can be placed on any free location of the board
+        without violating the invariant?"""
+        for x, col in enumerate(self.grid):
+            for y, cell in enumerate(col):
+                if cell is None:
+                    if self.try_place(location, x, y, place=False) == []:
+                        self._logger.debug('Location %s can be placed at col x=%d, row y=%d.',
+                                           location.city, x, y)
+                        return True
+        self._logger.debug('Location %s cannot be placed.', location.city)
+        return False

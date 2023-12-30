@@ -54,6 +54,7 @@ class MappUI(tk.Tk):
         self.player_names = []
         self.title(self.messages['app name'])
         self._frame = None
+        self.configure(bg='')
         self.logger.debug('%s initialized.', self.__class__)
         self.switch_frame(StartMenu)
 

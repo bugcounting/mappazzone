@@ -105,19 +105,51 @@ class Game:
             'Initializing game with %s locations.', len(self.deck))
         self.rounds = 0
         self.turn = 0
-        # Pick center location
-        center = self.deck.pick()[0]
-        self._logger.debug('Center location: %s', center)
-        self.board = Board(center=center,
-                           options=self.options.board())
-        self.players = [Player(name) for name in players]
-        # Pick initial hand of players
-        for player in self.players:
-            player.deal(self.deck.pick(self.options.initial()))
+        while True:
+            try:
+                # Pick center location (using deck.pick() since board.pick() is not yet available)
+                center = self.deck.pick()[0]
+                self._logger.debug('Center location: %s', center)
+                self.board = Board(center=center,
+                                   options=self.options.board())
+                self.players = [Player(name) for name in players]
+                # Pick initial hand of players
+                for player in self.players:
+                    player.deal(self.pick(self.options.initial()))
+            except ValueError:
+                self._logger.debug('Game initialization failed: retrying.')
+            break
 
     def log_setup(self):
         """Set up logger for this class."""
         self._logger = logging.getLogger(__name__)
+
+    def pick(self, k=1) -> List[Location]:
+        """Return a list with `k` random locations and remove them from the deck.
+        If options.only_sat(), then only locations that are placeable are drawn."""
+        to_draw = k
+        result = []
+        while to_draw > 0:
+            try:
+                locs = self.deck.pick(to_draw)
+            except ValueError as e:
+                if self.options.only_sat():
+                    self._logger.debug(
+                        'Out of placeable cities: forcing gameover.')
+                else:
+                    self._logger.critical(
+                        'It seems `pick` has been called in a gameover state.')
+                raise e
+            assert len(locs) == to_draw
+            if self.options.only_sat():
+                placeable = [l for l in locs if self.board.can_place(l)]
+            else:
+                placeable = locs
+            result += placeable
+            to_draw -= len(placeable)
+        if len(result) != k:
+            self._logger.critical('Expected %d cities got %d.', k, len(result))
+        return result
 
     def current_player(self) -> Player:
         """The player who is playing next."""
@@ -130,7 +162,13 @@ class Game:
         if not self.options.may_swap():
             raise ValueError("Swapping is now allowed")
         self._logger.debug('Player %s swaps %s', player.name, location)
-        new_location = self.deck.pick()[0]
+        try:
+            new_location = self.pick()[0]
+        except ValueError as e:
+            if self.options.only_sat():
+                self.next_player()
+                return
+            raise e
         player.swap(location, new_location)
         self.next_player()
 
@@ -149,8 +187,14 @@ class Game:
         # Remove location from player's hand
         player.play(location)
         # If result was not successful, draw new locations
-        player.deal(self.deck.pick(
-            self.options.to_draw(result, player.score())))
+        try:
+            player.deal(
+                self.pick(self.options.to_draw(result, player.score())))
+        except ValueError as e:
+            if self.options.only_sat():
+                pass
+            else:
+                raise e
         self.next_player()
         return result
 

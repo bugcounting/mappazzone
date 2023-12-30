@@ -123,3 +123,18 @@ class TestBoard:
         violations = board.try_place(madrid, x=2, y=4)
         # latitude difference is within tolerance
         assert len(violations) == 0
+
+    def test_can_place(self):
+        center = Location('center', '', 0, 0, 'country', 'iso2', 'iso3', 0, 0,
+                          Continent.EU)
+        board = Board(center, Board.BoardOptions(10))
+        left = Location('L', '', -50, 0, 'country',
+                        'iso2', 'iso3', 0, 0, Continent.EU)
+        # immediately left of center
+        vs = board.try_place(left, *board.coords(-1, 0, centered=True))
+        assert vs == []
+        # now any location with -50 < longitude < 0 (modulo tolerance)
+        # cannot be placed on the board without violating the invariant
+        unplaceable = Location('U', '', -25, 0, 'country',
+                               'iso2', 'iso3', 0, 0, Continent.EU)
+        assert not board.can_place(unplaceable)

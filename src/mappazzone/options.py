@@ -72,6 +72,10 @@ class EmptyOptions:
         """Return iterator over (option_tag, option) pairs."""
         return self._OPTIONS.items()
 
+    def only_sat(self) -> bool:
+        """Should only placeable cities be drawn?"""
+        return self['only sat']
+
     def continents(self) -> Set[Continent]:
         """Use only locations in these continents."""
         result = [c for c in list(Continent) if (
@@ -136,8 +140,10 @@ class EmptyOptions:
                 return 'game over hand'
         if 0 < self['end placed'] <= placed:
             return 'game over placed'
-        # len(scores) gives the number of players
-        if deck - self['empty deck'] <= len(scores):
+        # Upper bound on the number of cities to be drawn in another round
+        max_k = len(scores) * \
+            self.to_draw([Direction.LATITUDE, Direction.LONGITUDE], 1)
+        if deck - self['empty deck'] < max_k:
             return 'game over deck'
         return ''
 
@@ -255,7 +261,7 @@ class EmptyOptions:
         'only sat': Option(
             name='', description='',
             choices=[True, False],
-            value=True
+            value=False
         ),
         'wrap': Option(
             name='', description='',
